@@ -2,6 +2,10 @@ body {
 }
 
 .search-form {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0px;
+  background-color: rgb(55, 115, 204);
 }
 
 .gallery {
