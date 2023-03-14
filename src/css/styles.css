@@ -34,15 +34,12 @@
 .card-info {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 25px;
 }
 
 .info-item {
-  display: flex;
-  justify-content: center;
-  align-content: space-between;
+  text-align: center;
   font-size: 12px;
-  width: calc(100% / 4);
 }
 
 .gallery__image {
@@ -64,4 +61,22 @@
 
 .gallery__link:hover {
   cursor: zoom-in;
+}
+
+.search-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  fill: rgb(55, 115, 204);
+}
+
+.load-more {
+  display: flex;
+  margin: 25px auto;
+  border-radius: 5px;
+  padding: 5px 15px;
+  background-color: rgb(55, 115, 204);
+  color: white;
+  border: none;
+  cursor: pointer;
 }
