@@ -45,8 +45,6 @@
 .gallery__image {
   height: 100%;
   width: 100%;
-  object-fit: cover;
-  transition: transform var(--animation-duration) var(--timing-function);
 }
 
 .gallery__image:hover {
@@ -79,4 +77,9 @@
   color: white;
   border: none;
   cursor: pointer;
+  opacity: 0;
+}
+
+.opacity {
+  opacity: 1;
 }

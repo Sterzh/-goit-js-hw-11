@@ -3,6 +3,7 @@ import API from './js/fetch';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Notiflix from 'notiflix';
+import lazy from 'lazysizes';
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -11,13 +12,13 @@ const refs = {
   loadMore: document.querySelector('.load-more'),
 };
 
-console.log(refs.loadMore);
-
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMore.addEventListener('click', onLoadMore);
 
 function onSearch(e) {
   e.preventDefault();
+
+  refs.gallery.innerHTML = ' ';
 
   const requestValue = refs.input.value;
 
@@ -25,8 +26,8 @@ function onSearch(e) {
 
   API.fetchValue(requestValue)
     .then(value => {
-      // console.log(value);
-      render(value.hits);
+      Notiflix.Notify.info(`Hooray! We found ${value.totalHits} images.`);
+      render(value);
     })
     .catch(error => {
       console.log(error);
@@ -35,10 +36,10 @@ function onSearch(e) {
 
 function onLoadMore(e) {
   const requestValue = refs.input.value;
+
   API.fetchValue(requestValue)
     .then(value => {
-      // console.log(value);
-      render(value.hits);
+      render(value);
     })
     .catch(error => {
       console.log(error);
@@ -46,13 +47,24 @@ function onLoadMore(e) {
 }
 
 function render(value) {
-  console.log(value);
   if (value === []) {
     Notiflix.Notify.info(
       'Sorry, there are no images matching your search query. Please try again.'
     );
+  } else if (
+    refs.gallery.children.length >=
+    value.totalHits - API.quantityObjects
+  ) {
+    refs.loadMore.classList.remove('opacity');
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
   } else {
-    const markup = value
+    refs.loadMore.classList.add('opacity');
+
+    console.log(value);
+
+    const markup = value.hits
       .map(
         ({
           tags,
@@ -63,12 +75,14 @@ function render(value) {
           comments,
           downloads,
         }) => {
-          return `<div class="gallery__card"><a class="gallery__link" href="${largeImageURL}"><img class="gallery__image" src="${webformatURL}" alt="${tags}" loading="lazy" /></a><div class="card-info"><p class="info-item"><b>Likes<br>${likes}</b></p><p class="info-item"><b>Views<br>${views}</b></p><p class="info-item"><b>Comments<br>${comments}</b></p><p class="info-item"><b>Downloads<br>${downloads}</b></p></div></div>`;
+          return `<div class="gallery__card"><a class="gallery__link" href="${largeImageURL}"><img class="gallery__image lazyload" data-src="${webformatURL}" alt="${tags}"/></a><div class="card-info"><p class="info-item"><b>Likes<br>${likes}</b></p><p class="info-item"><b>Views<br>${views}</b></p><p class="info-item"><b>Comments<br>${comments}</b></p><p class="info-item"><b>Downloads<br>${downloads}</b></p></div></div>`;
         }
       )
       .join('');
 
-    refs.gallery.innerHTML = markup;
+    refs.gallery.insertAdjacentHTML('beforeend', markup);
+
+    console.log(refs.gallery.children.length);
 
     const litebox = new SimpleLightbox('.gallery a', {
       captionDelay: 250,
