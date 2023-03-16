@@ -83,16 +83,16 @@ async function render(value) {
 
     renderGallery = await refs.gallery.insertAdjacentHTML('beforeend', markup);
 
+    const litebox = new SimpleLightbox('.gallery a', {
+      captionDelay: 250,
+      captionsData: 'alt',
+    });
+
     if (refs.gallery.children.length === value.totalHits) {
       refs.loadMore.classList.remove('opacity');
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
     }
-
-    const litebox = new SimpleLightbox('.gallery a', {
-      captionDelay: 250,
-      captionsData: 'alt',
-    });
   }
 }
