@@ -4,6 +4,7 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Notiflix from 'notiflix';
 import lazy from 'lazysizes';
+import axios from 'axios';
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -15,31 +16,69 @@ const refs = {
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMore.addEventListener('click', onLoadMore);
 
-function onSearch(e) {
+async function onSearch(e) {
   e.preventDefault();
 
-  refs.gallery.innerHTML = ' ';
+  const resetGallery = (refs.gallery.innerHTML = ' ');
+  const requestValue = await refs.input.value;
+  const resetPage = await API.resetPage();
 
-  const requestValue = refs.input.value;
+  try {
+    const fetchPictures = await API.fetchPictures(requestValue);
 
-  API.resetPage();
-
-  API.fetchValue(requestValue)
-    .then(value => {
+    if (value.hits.length === 0) {
+      Notiflix.Notify.info(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    } else {
       Notiflix.Notify.info(`Hooray! We found ${value.totalHits} images.`);
       render(value);
-    })
-    .catch(error => {
-      console.log(error);
-    });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+// function onSearch(e) {
+//   e.preventDefault();
+
+//   refs.gallery.innerHTML = ' ';
+
+//   const requestValue = refs.input.value;
+
+//   API.resetPage();
+
+//   API.fetchPictures(requestValue)
+//     .then(value => {
+//       console.log();
+//       if (value.hits.length === 0) {
+//         Notiflix.Notify.info(
+//           'Sorry, there are no images matching your search query. Please try again.'
+//         );
+//       } else {
+//         Notiflix.Notify.info(`Hooray! We found ${value.totalHits} images.`);
+//         render(value);
+//       }
+//     })
+//     .catch(error => {
+//       console.log(error);
+//     });
+// }
 
 function onLoadMore(e) {
   const requestValue = refs.input.value;
 
-  API.fetchValue(requestValue)
+  API.fetchPictures(requestValue)
     .then(value => {
       render(value);
+      const { height: cardHeight } = document
+        .querySelector('.gallery')
+        .firstElementChild.getBoundingClientRect();
+
+      window.scrollBy({
+        top: cardHeight * 1.2,
+        behavior: 'smooth',
+      });
     })
     .catch(error => {
       console.log(error);
@@ -47,22 +86,8 @@ function onLoadMore(e) {
 }
 
 function render(value) {
-  if (value === []) {
-    Notiflix.Notify.info(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-  } else if (
-    refs.gallery.children.length >=
-    value.totalHits - API.quantityObjects
-  ) {
-    refs.loadMore.classList.remove('opacity');
-    Notiflix.Notify.info(
-      "We're sorry, but you've reached the end of search results."
-    );
-  } else {
+  if (refs.gallery.children.length < value.totalHits) {
     refs.loadMore.classList.add('opacity');
-
-    console.log(value);
 
     const markup = value.hits
       .map(
@@ -82,11 +107,17 @@ function render(value) {
 
     refs.gallery.insertAdjacentHTML('beforeend', markup);
 
-    console.log(refs.gallery.children.length);
-
     const litebox = new SimpleLightbox('.gallery a', {
       captionDelay: 250,
       captionsData: 'alt',
     });
+
+    console.dir(refs.gallery.children.length);
+    if (refs.gallery.children.length === value.totalHits) {
+      refs.loadMore.classList.remove('opacity');
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
   }
 }
