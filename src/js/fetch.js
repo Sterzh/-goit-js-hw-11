@@ -26,4 +26,4 @@ function resetPage() {
   page = 1;
 }
 
-export default { fetchPictures, resetPage, quantityObjects };
+export default { fetchPictures, resetPage };
