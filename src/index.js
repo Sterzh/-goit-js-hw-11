@@ -25,9 +25,7 @@ async function onSearch(e) {
 
   if (requestValue === '') {
     refs.loadMore.classList.remove('opacity');
-  }
-
-  if (requestValue !== '') {
+  } else {
     try {
       const fetchPictures = await API.fetchPictures(requestValue);
 
@@ -68,10 +66,6 @@ async function onLoadMore(e) {
 }
 
 async function render(value) {
-  if (refs.input.value === '') {
-    refs.loadMore.classList.remove('opacity');
-  }
-
   if (refs.gallery.children.length < value.totalHits) {
     refs.loadMore.classList.add('opacity');
 
