@@ -81,7 +81,7 @@ async function render(value) {
       )
       .join('');
 
-    const renderGallery = await refs.gallery.insertAdjacentHTML('beforeend', markup);
+    refs.gallery.insertAdjacentHTML('beforeend', markup);
 
     const litebox = await new SimpleLightbox('.gallery a', {
       captionDelay: 250,
