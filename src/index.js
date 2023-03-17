@@ -23,21 +23,27 @@ async function onSearch(e) {
   const requestValue = await refs.input.value;
   const resetPage = await API.resetPage();
 
-  try {
-    const fetchPictures = await API.fetchPictures(requestValue);
+  if (requestValue === '') {
+    refs.loadMore.classList.remove('opacity');
+  }
 
-    if (fetchPictures.hits.length === 0) {
-      Notiflix.Notify.info(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    } else {
-      Notiflix.Notify.info(
-        `Hooray! We found ${fetchPictures.totalHits} images.`
-      );
-      render(fetchPictures);
+  if (requestValue !== '') {
+    try {
+      const fetchPictures = await API.fetchPictures(requestValue);
+
+      if (fetchPictures.hits.length === 0) {
+        Notiflix.Notify.info(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else {
+        Notiflix.Notify.info(
+          `Hooray! We found ${fetchPictures.totalHits} images.`
+        );
+        render(fetchPictures);
+      }
+    } catch (error) {
+      Notiflix.Notify.failure(error);
     }
-  } catch (error) {
-    Notiflix.Notify.failure(error);
   }
 }
 
@@ -62,6 +68,10 @@ async function onLoadMore(e) {
 }
 
 async function render(value) {
+  if (refs.input.value === '') {
+    refs.loadMore.classList.remove('opacity');
+  }
+
   if (refs.gallery.children.length < value.totalHits) {
     refs.loadMore.classList.add('opacity');
 
@@ -81,9 +91,9 @@ async function render(value) {
       )
       .join('');
 
-    renderGallery = await refs.gallery.insertAdjacentHTML('beforeend', markup);
+    refs.gallery.insertAdjacentHTML('beforeend', markup);
 
-    const litebox = await new SimpleLightbox('.gallery a', {
+    const lightbox = new SimpleLightbox('.gallery a', {
       captionDelay: 250,
       captionsData: 'alt',
     });
