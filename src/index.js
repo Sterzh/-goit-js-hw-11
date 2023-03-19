@@ -20,15 +20,15 @@ async function onSearch(e) {
   e.preventDefault();
 
   const resetGallery = await (refs.gallery.innerHTML = ' ');
-  const requestValue = await refs.input.value;
+  const requestValue = await refs.input.value.trim();
   const resetPage = await API.resetPage();
 
   if (requestValue === '') {
     refs.loadMore.classList.remove('opacity');
+    refs.input.value = '';
   } else {
     try {
       const fetchPictures = await API.fetchPictures(requestValue);
-
       if (fetchPictures.hits.length === 0) {
         Notiflix.Notify.info(
           'Sorry, there are no images matching your search query. Please try again.'
