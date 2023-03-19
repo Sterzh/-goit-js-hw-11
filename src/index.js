@@ -16,6 +16,11 @@ const refs = {
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMore.addEventListener('click', onLoadMore);
 
+let lightbox = new SimpleLightbox('.gallery a', {
+  captionDelay: 250,
+  captionsData: 'alt',
+});
+
 async function onSearch(e) {
   e.preventDefault();
 
@@ -87,10 +92,7 @@ async function render(value) {
 
     refs.gallery.insertAdjacentHTML('beforeend', markup);
 
-    const lightbox = new SimpleLightbox('.gallery a', {
-      captionDelay: 250,
-      captionsData: 'alt',
-    });
+    lightbox.refresh();
 
     if (refs.gallery.children.length === value.totalHits) {
       refs.loadMore.classList.remove('opacity');
